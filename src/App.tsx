@@ -1,17 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from "react";
 import axios from "axios";
 import "./index.css";
 
-const ChipComponent = () => {
-  const [inputValue, setInputValue] = useState("");
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [dropdownItems, setDropdownItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  profileIcon: string;
+}
+
+const ChipComponent: React.FC = () => {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [selectedItems, setSelectedItems] = useState<User[]>([]);
+  const [dropdownItems, setDropdownItems] = useState<User[]>([]);
+  const [filteredItems, setFilteredItems] = useState<User[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     axios.get("https://jsonplaceholder.typicode.com/users").then((response) => {
-      const fetchedItems = response.data.map((user) => ({
+      const fetchedItems: User[] = response.data.map((user: any) => ({
         id: user.id,
         name: user.name,
         email: user.email,
@@ -22,8 +29,8 @@ const ChipComponent = () => {
     });
   }, []);
 
-  const handleInputChange = (event) => {
-    const value = event.target.value;
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value: string = event.target.value;
     setInputValue(value);
     setIsOpen(!!value);
 
@@ -35,7 +42,7 @@ const ChipComponent = () => {
     setFilteredItems(filteredItems);
   };
 
-  const handleItemClick = (item) => {
+  const handleItemClick = (item: User) => {
     const updatedSelectedItems = [...selectedItems, item];
     const updatedDropdownItems = dropdownItems.filter(
       (dropdownItem) => dropdownItem !== item
@@ -48,7 +55,7 @@ const ChipComponent = () => {
     setFilteredItems(updatedDropdownItems);
   };
 
-  const handleChipRemove = (removedItem) => {
+  const handleChipRemove = (removedItem: User) => {
     const updatedSelectedItems = selectedItems.filter(
       (selectedItem) => selectedItem !== removedItem
     );
@@ -59,7 +66,7 @@ const ChipComponent = () => {
     setFilteredItems(updatedDropdownItems);
   };
 
-  const handleBackspace = (event) => {
+  const handleBackspace = (event: KeyboardEvent<HTMLInputElement>) => {
     if (
       event.key === "Backspace" &&
       inputValue === "" &&
@@ -94,18 +101,16 @@ const ChipComponent = () => {
           </div>
         ))}
         <input
-  type="text"
- 
-  value={inputValue}
-  onChange={handleInputChange}
-  onKeyDown={handleBackspace}
-  placeholder="Add New User.."
-  onClick={() => setIsOpen(true)}
-  className={`flex-1 outline-none p-2 ${
-    inputValue ? "border-b-2 border-blue-500" : "border-b-2 border-blue-300"
-  }`}
-/>
-
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleBackspace}
+          placeholder="Add New User.."
+          onClick={() => setIsOpen(true)}
+          className={`flex-1 outline-none p-2 ${
+            inputValue ? "border-b-2 border-blue-500" : "border-b-2 border-blue-300"
+          }`}
+        />
       </div>
       {isOpen && filteredItems.length > 0 && (
         <div className="dropdown-list bg-white shadow-md rounded mt-1 overflow-y-auto w-[50%] absolute left-0">
